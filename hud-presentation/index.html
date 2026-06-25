@@ -774,7 +774,9 @@ showSlide(0);
   #comments-panel.open { right: 0 !important; }
 </style>
 <script>
-function loadGiscus(slideNum) {
+var giscusLoaded = false;
+
+function initGiscus(slideNum) {
   var container = document.getElementById('giscus-container');
   container.innerHTML = '';
   document.getElementById('panel-title').textContent = 'Feedback — Slide ' + slideNum;
@@ -794,9 +796,34 @@ function loadGiscus(slideNum) {
   script.setAttribute('data-lang', 'en');
   script.crossOrigin = 'anonymous';
   container.appendChild(script);
+  giscusLoaded = true;
 }
+
+function updateGiscus(slideNum) {
+  document.getElementById('panel-title').textContent = 'Feedback — Slide ' + slideNum;
+  document.getElementById('comments-btn').textContent = '💬 Feedback';
+  var iframe = document.querySelector('#giscus-container iframe.giscus-frame');
+  if (iframe) {
+    iframe.contentWindow.postMessage({
+      giscus: { setConfig: { term: 'hud-presentation/slide-' + slideNum } }
+    }, 'https://giscus.app');
+  } else {
+    initGiscus(slideNum);
+  }
+}
+
+// Load immediately for slide 1
+initGiscus(1);
+
+// Hook into slide navigation
+var _origNavigate = navigate;
+navigate = function(dir) {
+  _origNavigate(dir);
+  updateGiscus(current + 1);
+};
+
 document.getElementById('comments-btn').addEventListener('click', function() {
-  loadGiscus(current + 1);
+  if (!giscusLoaded) initGiscus(current + 1);
   document.getElementById('comments-panel').classList.add('open');
 });
 document.getElementById('close-panel').addEventListener('click', function() {
