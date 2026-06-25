@@ -764,10 +764,11 @@ showSlide(0);
 
 
 <div id="comments-panel" style="position:fixed;top:0;right:-420px;width:420px;height:100vh;background:#1e2235;border-left:1px solid var(--border);z-index:10000;transition:right 0.3s var(--ease);overflow-y:auto;padding:24px;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
     <h3 id="panel-title" style="font-family:var(--font-display);color:var(--text);font-size:20px;">Feedback — Slide 1</h3>
     <button id="close-panel" onclick="document.getElementById('comments-panel').classList.remove('open')" style="background:none;border:none;color:var(--dim);font-size:24px;cursor:pointer;">✕</button>
   </div>
+  <a href="https://github.com/RomKadria/decks/discussions" target="_blank" style="display:inline-block;margin-bottom:16px;color:var(--accent);font-family:var(--font-body);font-size:13px;text-decoration:none;">View all comments across slides →</a>
   <div id="giscus-container"></div>
 </div>
 <style>
