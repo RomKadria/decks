@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hud at monday.com</title>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=clash-display@600,700&display=swap">
+<style>
+/* ===========================================
+   CSS CUSTOM PROPERTIES
+   =========================================== */
+:root {
+  --stage-bg: #1a1d2e;
+  --slide-bg: #1a1d2e;
+  --accent: #6c63ff;
+  --accent-dim: rgba(108, 99, 255, 0.15);
+  --accent-border: rgba(108, 99, 255, 0.35);
+  --green: #00ca72;
+  --green-dim: rgba(0, 202, 114, 0.12);
+  --green-border: rgba(0, 202, 114, 0.3);
+  --amber: #fdab3d;
+  --red: #e44258;
+  --text: #ffffff;
+  --dim: rgba(255,255,255,0.7);
+  --card-bg: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.12);
+  --font-display: 'Clash Display', sans-serif;
+  --font-body: 'Satoshi', sans-serif;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* === VIEWPORT BASE (MANDATORY) === */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; display: block; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, video, canvas, svg { max-width: 100%; max-height: 100%; }
+.deck-controls { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 1000; }
+@media print { html, body { width: 1920px; height: auto; overflow: visible; background: #fff; } .deck-viewport { position: static; overflow: visible; } .deck-stage { position: static; width: auto; height: auto; transform: none !important; } .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; } .deck-controls { display: none !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; } }
+
+/* === SLIDE LAYOUTS === */
+.slide-content {
+  padding: 80px 100px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-family: var(--font-body);
+  color: var(--text);
+}
+
+/* === TYPOGRAPHY === */
+.eyebrow {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+h2 {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--dim);
+  margin-bottom: 40px;
+  line-height: 1.4;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+p, li {
+  font-size: 22px;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+.hl { color: var(--accent); }
+.gr { color: var(--green); }
+.am { color: var(--amber); }
+.rd { color: var(--red); }
+
+/* === TITLE SLIDE === */
+.slide-title .slide-content {
+  justify-content: center;
+  align-items: flex-start;
+  background: radial-gradient(ellipse at 25% 55%, #252850, #1a1d2e 68%);
+}
+.slide-title h1 { font-size: 82px; margin-bottom: 16px; }
+.slide-title .subtitle { font-size: 24px; color: var(--dim); max-width: 600px; margin-bottom: 32px; }
+
+/* === DIVIDER SLIDE === */
+.slide-divider .slide-content {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: radial-gradient(ellipse at 50% 50%, rgba(108,99,255,0.12), #1a1d2e 65%);
+}
+.slide-divider h1 { font-size: 72px; }
+.slide-divider h2 { margin-top: 8px; }
+
+/* === CARDS === */
+.cards { display: grid; gap: 16px; width: 100%; }
+.cards-2 { grid-template-columns: 1fr 1fr; }
+.cards-3 { grid-template-columns: 1fr 1fr 1fr; }
+.cards-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+}
+.card.accent { border-color: var(--accent-border); }
+.card.green { border-color: var(--green-border); }
+.card.amber { border-color: rgba(251,191,36,0.3); }
+.card.red { border-color: rgba(248,113,113,0.3); }
+
+.card h3 { font-size: 24px; margin-bottom: 10px; }
+.card p { font-size: 22px; color: rgba(255,255,255,0.9); line-height: 1.55; }
+
+.num { font-size: 36px; font-weight: 900; margin-bottom: 4px; }
+
+/* === TABLES === */
+.data-table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); font-size: 22px; }
+.data-table th { background: var(--accent-dim); color: var(--accent); font-weight: 600; padding: 18px 28px; text-align: left; border-bottom: 1px solid var(--accent-border); font-size: 20px; }
+.data-table td { padding: 16px 28px; border-bottom: 1px solid var(--border); color: var(--text); }
+.data-table tr:last-child td { border-bottom: none; }
+
+/* === LISTS === */
+ul.styled { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+ul.styled li { font-size: 26px; line-height: 1.5; padding-left: 32px; position: relative; color: #ffffff; }
+ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(--green); font-weight: 500; }
+
+/* === CALLOUT === */
+.callout {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+  padding: 20px 28px;
+  margin-top: 20px;
+}
+.callout.green { background: var(--green-dim); border-color: var(--green-border); }
+.callout p { font-size: 24px; color: #ffffff; line-height: 1.55; }
+
+/* === TWO COLUMNS === */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+
+/* === PILL === */
+.pill { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+.pill.accent { background: var(--accent-dim); border: 1px solid var(--accent-border); color: var(--accent); }
+.pill.green { background: var(--green-dim); border: 1px solid var(--green-border); color: var(--green); }
+.pill.amber { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.3); color: var(--amber); }
+
+/* === IMAGES === */
+.slide-img { border-radius: 8px; border: none; box-shadow: none; }
+.img-row { display: flex; gap: 16px; align-items: flex-start; }
+
+/* === METRIC ROW === */
+.metric-row { display: flex; gap: 20px; flex-wrap: wrap; }
+.metric-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; text-align: center; flex: 1; min-width: 160px; }
+.metric-box .num { font-size: 32px; font-weight: 900; color: var(--green); }
+.metric-box .label { font-size: 14px; color: var(--dim); margin-top: 4px; }
+
+/* === ANIMATIONS === */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.slide.visible .reveal:nth-child(1) { transition-delay: 0.05s; }
+.slide.visible .reveal:nth-child(2) { transition-delay: 0.12s; }
+.slide.visible .reveal:nth-child(3) { transition-delay: 0.2s; }
+.slide.visible .reveal:nth-child(4) { transition-delay: 0.28s; }
+.slide.visible .reveal:nth-child(5) { transition-delay: 0.36s; }
+.slide.visible .reveal:nth-child(6) { transition-delay: 0.44s; }
+
+/* === NAV === */
+.nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  padding: 14px 72px; display: flex; align-items: center; gap: 16px;
+  background: rgba(20,22,36,0.95); border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--dim); font-family: var(--font-body); z-index: 9999;
+}
+.nav button {
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  color: var(--text); padding: 7px 18px; border-radius: 6px; cursor: pointer; font-size: 13px; font-family: var(--font-body);
+}
+.nav button:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+.nav button:disabled { opacity: 0.3; cursor: default; }
+#slide-num { margin-left: auto; }
+
+/* === QUOTE === */
+.quote { font-size: 20px; font-style: italic; color: rgba(255,255,255,0.7); border-left: 3px solid var(--accent); padding-left: 20px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+<!-- 1: TITLE -->
+<section class="slide slide-title active">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Engineering Productivity</div>
+    <h1 class="reveal">Hud at <span class="hl">monday.com</span></h1>
+    <p class="subtitle reveal">Function-level observability — proving the value across our stack.</p>
+    <div class="reveal"><span class="pill accent">June 2026</span></div>
+  </div>
+</section>
+
+<!-- 2: WHY WE ADOPTED -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">The Gap</div>
+    <h1 class="reveal">Why We Adopted <span class="hl">Hud</span></h1>
+    <h2 class="reveal">What our existing tools (Datadog, Coralogix, MCPs) don't cover.</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <h3 style="color:var(--dim); font-size:15px; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px;">What we already have</h3>
+        <ul class="styled">
+          <li>Service-level metrics, logs, and traces</li>
+          <li>Alerting and dashboards</li>
+          <li>MCP access to query observability data</li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <h3 style="color:var(--green); font-size:15px; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px;">The gap Hud fills</h3>
+        <ul class="styled">
+          <li><strong style="color:var(--green)">Function-level depth</strong> — latency, CPU per function</li>
+          <li><strong style="color:var(--green)">Code-connected</strong> — IDE + MCP linked to code & git</li>
+          <li><strong style="color:var(--green)">Forensics</strong> — auto-traces on errors/spikes</li>
+          <li><strong style="color:var(--green)">Unfamiliar service?</strong> — Hud MCP gives you the full story</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3: HOW HUD WORKS -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">How It Works</div>
+    <h1 class="reveal">Adding <span class="hl">Function-Level Depth</span></h1>
+    <h2 class="reveal">On top of our existing stack — not replacing it.</h2>
+    <table class="data-table reveal">
+      <tr><th>Current stack (DD / Coralogix)</th><th>What Hud adds</th></tr>
+      <tr><td>Alert fires → check dashboards</td><td>Alert includes <span class="gr">function-level root cause</span></td></tr>
+      <tr><td>Query logs via MCP, correlate manually</td><td>Forensics captured <span class="gr">automatically</span> on the spot</td></tr>
+      <tr><td>Traces available (sampled, expensive)</td><td>Smart sampling — <span class="gr">deep insight, low cost</span></td></tr>
+      <tr><td>Service-level visibility</td><td><span class="gr">Function-level</span> — see inside the service</td></tr>
+    </table>
+    <div class="callout reveal">
+      <p>MCP connected to code + production — ask in natural language, get answers. Complements DD/Coralogix — doesn't replace.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4: FORENSICS -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Key Concept</div>
+    <h1 class="reveal">What Are <span class="hl">Forensics</span>?</h1>
+    <h2 class="reveal">Traces when you need them — automatically. Not always-on.</h2>
+    <div class="two-col">
+      <div>
+        <table class="data-table reveal">
+          <tr><th>Trigger</th><th>What gets captured</th></tr>
+          <tr><td>Error / Exception</td><td>Full async context + stack trace</td></tr>
+          <tr><td>Latency spike</td><td>Function-level timing breakdown</td></tr>
+          <tr><td>CPU spike</td><td>Execution path + resource usage</td></tr>
+          <tr><td>Failure pattern</td><td>Call graph + peripherals</td></tr>
+        </table>
+      </div>
+      <div class="reveal">
+        <div class="card green">
+          <h3>Why this matters</h3>
+          <p>No cost of full tracing — captures only when something goes wrong. Complete async context, machine state, stack trace at the exact moment. No need to reproduce.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5: SDLC -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Full Lifecycle</div>
+    <h1 class="reveal">Hud Across the <span class="hl">SDLC</span></h1>
+    <h2 class="reveal">From writing code to auto-remediation.</h2>
+    <table class="data-table reveal" style="font-size:17px;">
+      <tr><th>Stage</th><th>What Hud does</th><th>How</th></tr>
+      <tr><td><span class="hl">Development</span></td><td>Production context + dead code detection</td><td>IDE extension + MCP</td></tr>
+      <tr><td><span class="hl">PR Review</span></td><td>Hot path detection — flag risky changes</td><td>Score PRs against production call frequency</td></tr>
+      <tr><td><span class="hl">Canary</span></td><td>Regression + coverage verification</td><td>Compare metrics + confirm code was exercised</td></tr>
+      <tr><td><span class="hl">Production</span></td><td>Proactive detection + forensics</td><td>Alerts with root cause, auto-traces</td></tr>
+      <tr><td><span class="hl">Refactoring</span></td><td>Dead code + call graph analysis</td><td>Identify unused functions, visualize flows</td></tr>
+      <tr><td><span class="hl">Incident</span></td><td>Company-wide debugger</td><td>MCP per service — function-level answers</td></tr>
+      <tr><td><span class="hl">Remediation</span></td><td>Self-heal</td><td>GitHub Action triggered by Hud → auto-fix</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 6: SDLC LOOP -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">The Full Loop</div>
+    <h1 class="reveal">From Detection to <span class="gr">Fix</span></h1>
+    <h2 class="reveal">No human bottleneck.</h2>
+    <div class="cards cards-2 reveal" style="margin-bottom:32px;">
+      <div class="card accent">
+        <h3><span class="hl">PR Stage</span></h3>
+        <p>Hud scores PRs against production call frequency. Touching a function called 48K×/min? Flagged as high risk.</p>
+      </div>
+      <div class="card accent">
+        <h3><span class="hl">Canary Stage</span></h3>
+        <p>Two signals: did function metrics regress? AND was new code actually exercised? Zero calls = canary didn't test it.</p>
+      </div>
+      <div class="card green">
+        <h3><span class="gr">Production</span></h3>
+        <p>Forensics + alerts with root cause on errors/spikes. Any engineer gets function-level answers instantly via MCP.</p>
+      </div>
+      <div class="card green">
+        <h3><span class="gr">Self-Heal</span></h3>
+        <p>Hud triggers GitHub Action with code access → proposes and applies fix automatically. Loop closes without a human.</p>
+      </div>
+    </div>
+    <div class="callout reveal">
+      <p>Other tools give you data <em>after</em> something breaks. Hud gives you production intelligence <strong style="color:var(--green)">at every stage</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7: HUD UI - ENDPOINT -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">The Product</div>
+    <h1 class="reveal"><span class="hl">Endpoint View</span></h1>
+    <h2 class="reveal">Invocations, duration, error rate, status codes, and all functions in the flow.</h2>
+    <div class="img-row reveal">
+      <img src="images/hud-endpoint-view.png" class="slide-img" style="width:48%;">
+      <img src="images/hud-functions-list.png" class="slide-img" style="width:48%;">
+    </div>
+  </div>
+</section>
+
+<!-- 8: HUD UI - FUNCTION -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">The Product</div>
+    <h1 class="reveal"><span class="hl">Function Deep Dive</span></h1>
+    <h2 class="reveal">Call graph + invocations + duration — per function, in production.</h2>
+    <div class="reveal">
+      <img src="images/hud-function-callgraph.png" class="slide-img" style="width:100%; max-height:680px; object-fit:contain;">
+    </div>
+  </div>
+</section>
+
+<!-- 9: SUCCESS STORIES DIVIDER -->
+<section class="slide slide-divider">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Proven Impact</div>
+    <h1 class="reveal">Success Stories</h1>
+    <h2 class="reveal">Real teams at monday.com already benefiting.</h2>
+  </div>
+</section>
+
+<!-- 10: APPS-BACKEND STORY -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Success Story</div>
+    <h1 class="reveal">apps-backend: <span class="gr">Crisis Prevented</span></h1>
+    <h2 class="reveal">Hud surfaced a critical performance issue before it reached production.</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <h3 style="margin-bottom:12px;">What happened</h3>
+        <ul class="styled">
+          <li>Event loop blocked (~15s lag)</li>
+          <li>All responses timing out</li>
+          <li>Pod CPU saturated at 98%</li>
+          <li>Pods restarting continuously</li>
+        </ul>
+        <div class="quote" style="margin-top:24px;">"Thanks to Hud for surfacing the issue and helping us track it down quickly."</div>
+      </div>
+      <div class="reveal">
+        <h3 style="margin-bottom:12px;">Hud's role</h3>
+        <div class="card green">
+          <p>Hud <strong style="color:var(--green)">proactively detected</strong> and surfaced the issue — the team didn't find it from an alert. Root cause identified in minutes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11: APPS-BACKEND METRICS -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">apps-backend</div>
+    <h1 class="reveal">The <span class="gr">Impact</span></h1>
+    <div class="metric-row reveal" style="margin-bottom:24px;">
+      <div class="metric-box"><div class="num">-95%</div><div class="label">Event Loop Lag</div></div>
+      <div class="metric-box"><div class="num">-57%</div><div class="label">ELU (p99)</div></div>
+      <div class="metric-box"><div class="num">-59%</div><div class="label">Pod CPU (p99)</div></div>
+      <div class="metric-box"><div class="num">-89%</div><div class="label">Latency (p99)</div></div>
+      <div class="metric-box"><div class="num">-70%</div><div class="label">Latency (avg)</div></div>
+      <div class="metric-box"><div class="num" style="color:var(--green);">0</div><div class="label">Pod Restarts</div></div>
+    </div>
+    <div class="img-row reveal">
+      <img src="images/apps-backend-metrics.png" class="slide-img" style="width:48%;">
+      <img src="images/apps-backend-containers.png" class="slide-img" style="width:48%;">
+    </div>
+  </div>
+</section>
+
+<!-- 12: BOARDS DIVIDER -->
+<section class="slide slide-divider">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Boards Team</div>
+    <h1 class="reveal">Prompt-to-Board</h1>
+    <h2 class="reveal">Error rate from 7% to 0.7%</h2>
+  </div>
+</section>
+
+<!-- 13: BOARDS STORY -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Success Story</div>
+    <h1 class="reveal">PTB Error Rate: <span class="gr">90% Reduction</span></h1>
+    <h2 class="reveal">suggestAndCreateBoardFromPrompt() — core AI board creation flow.</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <ul class="styled">
+          <li>Was failing <strong style="color:var(--red)">7.1%</strong> of the time (218 errors/week)</li>
+          <li>Identified the <strong style="color:var(--green)">exact error flow</strong> in minutes</li>
+          <li>Pinpointed the failing function in the chain</li>
+          <li>Team applied targeted fix — no guesswork</li>
+        </ul>
+        <div class="quote" style="margin-top:20px;">"With Hud you can easily identify the error flow — in just a few minutes."</div>
+      </div>
+      <div class="reveal">
+        <div class="metric-row" style="flex-direction:column; gap:12px;">
+          <div class="metric-box"><div class="num" style="color:var(--red)">7.1%</div><div class="label">Before (218/week)</div></div>
+          <div class="metric-box"><div class="num" style="color:var(--green)">0.7%</div><div class="label">After (23/week)</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 14: BOARDS EVIDENCE -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Boards Evidence</div>
+    <h1 class="reveal">Error Rate: <span class="rd">7.1%</span> → <span class="gr">0.7%</span></h1>
+    <h2 class="reveal">Sustained improvement over time.</h2>
+    <div class="img-row reveal" style="margin-bottom:16px;">
+      <img src="images/ptb-before.png" class="slide-img" style="width:48%;">
+      <img src="images/ptb-after.png" class="slide-img" style="width:48%;">
+    </div>
+    <div class="reveal">
+      <img src="images/error-rate-trend.png" class="slide-img" style="width:70%; margin:0 auto; display:block;">
+    </div>
+  </div>
+</section>
+
+<!-- 15: QUEUE DEGRADATION -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Success Story</div>
+    <h1 class="reveal">Queue <span class="hl">Degradation</span></h1>
+    <h2 class="reveal">Detected 14 minutes after deployment — before users noticed.</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <img src="images/queue-degradation-alert.png" class="slide-img" style="width:100%;">
+      </div>
+      <div class="reveal">
+        <div class="card accent">
+          <h3>What happened</h3>
+          <p>Hud detected a massive queue degradation just 14 min post-deploy. Root cause shown immediately: specific functions responsible for the slowdown.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 16: REDLOCK -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Success Story</div>
+    <h1 class="reveal">Redlock <span class="hl">Misuse</span></h1>
+    <h2 class="reveal">Ranel found a lock acquisition bug causing 30s+ delays.</h2>
+    <div class="reveal">
+      <img src="images/redlock-misuse-slack.png" class="slide-img" style="width:85%;">
+    </div>
+  </div>
+</section>
+
+<!-- 17: ERROR ROOT CAUSE -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Success Story</div>
+    <h1 class="reveal">Error with <span class="gr">Root Cause</span></h1>
+    <h2 class="reveal">HudBot alerts with the exact function that threw the exception.</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <img src="images/error-root-cause-alert.png" class="slide-img" style="width:100%;">
+      </div>
+      <div class="reveal">
+        <div class="card green">
+          <h3>No log digging needed</h3>
+          <p>The alert itself contains the root cause: which function, which exception, which endpoint.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 18: CALL GRAPH -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Quality</div>
+    <h1 class="reveal">Call Graph <span class="hl">Visualization</span></h1>
+    <h2 class="reveal">Amit used Hud MCP to generate service call graphs for design reviews.</h2>
+    <div class="reveal">
+      <img src="images/amit-mcp-diagram.png" class="slide-img" style="width:90%;">
+    </div>
+  </div>
+</section>
+
+<!-- 19: DEAD CODE -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Quality</div>
+    <h1 class="reveal">Dead Code <span class="gr">Detection</span></h1>
+    <h2 class="reveal">Identify functions with 0 invocations in production — safe to remove.</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <img src="images/dead-code-detection.png" class="slide-img" style="width:100%;">
+      </div>
+      <div class="reveal">
+        <div class="card green">
+          <h3>Confident refactoring</h3>
+          <p>Backed by production data. No guessing — if it has zero calls, it's safe to delete.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 20: BOTTOM LINE DIVIDER -->
+<section class="slide slide-divider">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Summary</div>
+    <h1 class="reveal">The Bottom Line</h1>
+  </div>
+</section>
+
+<!-- 21: TIME TO INSIGHT -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Comparison</div>
+    <h1 class="reveal">Time-to-Insight</h1>
+    <h2 class="reveal">What Hud adds on top of existing tools.</h2>
+    <table class="data-table reveal">
+      <tr><th>Use Case</th><th>DD / Coralogix alone</th><th>With Hud</th></tr>
+      <tr><td>Error root cause</td><td>Service-level alerts + MCP log queries</td><td><span class="gr">Function-level in minutes</span></td></tr>
+      <tr><td>Performance bottleneck</td><td>Traces (expensive, manual correlation)</td><td><span class="gr">Immediate, per function</span></td></tr>
+      <tr><td>CPU spike investigation</td><td>Dashboard + pod-level metrics</td><td><span class="gr">Hud MCP question</span></td></tr>
+      <tr><td>Post-deploy regression</td><td>Monitor thresholds (reactive)</td><td><span class="gr">Proactive detection</span></td></tr>
+      <tr><td>Dead code identification</td><td>Not possible</td><td><span class="gr">Production-proven data</span></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 22: BUSINESS IMPACT -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Impact</div>
+    <h1 class="reveal">Business Impact <span class="gr">Summary</span></h1>
+    <h2 class="reveal">Quantified value delivered to monday.com.</h2>
+    <table class="data-table reveal">
+      <tr><th>Team / Area</th><th>Outcome</th><th>Business Impact</th></tr>
+      <tr><td>apps-backend</td><td>95% latency reduction</td><td><span class="gr">Production outage prevented</span></td></tr>
+      <tr><td>Boards (PTB)</td><td>90% error reduction</td><td><span class="gr">AI feature reliability</span></td></tr>
+      <tr><td>Boards (perf)</td><td>Ongoing optimization</td><td><span class="gr">Feature velocity maintained</span></td></tr>
+      <tr><td>Apps (CPU spike)</td><td>Instant root cause</td><td><span class="gr">Faster incident resolution</span></td></tr>
+      <tr><td>Automations</td><td>Queue degradation caught in 14min</td><td><span class="gr">User impact avoided</span></td></tr>
+      <tr><td>All teams</td><td>Investigation: hours → minutes</td><td><span class="gr">Engineering productivity</span></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 23: HOW HUD FITS -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Stack Integration</div>
+    <h1 class="reveal">How Hud <span class="hl">Fits</span> Our Stack</h1>
+    <h2 class="reveal">Each tool has its layer — together they cover everything.</h2>
+    <table class="data-table reveal" style="margin-bottom:24px;">
+      <tr><th>Tool</th><th>What it does best</th><th>Layer</th></tr>
+      <tr><td>Datadog</td><td>Metrics, APM, alerting, dashboards</td><td>Service-level</td></tr>
+      <tr><td>Coralogix</td><td>Log aggregation, querying, alerting</td><td>Log-level</td></tr>
+      <tr><td>DD/Coralogix MCPs</td><td>AI-assisted querying of logs + metrics</td><td>Service-level (via AI)</td></tr>
+      <tr><td><span class="hl">Hud</span></td><td>Function-level profiling, forensics, call graphs</td><td><span class="gr">Function-level</span></td></tr>
+    </table>
+    <div class="callout green reveal">
+      <p>DD/Coralogix <strong style="color:var(--green)">detect</strong>. Hud <strong style="color:var(--green)">pinpoints</strong>. Together: alert → root cause → fix, automatically.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 24: DEPLOYMENT -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Scale</div>
+    <h1 class="reveal"><span class="gr">28</span> Services Instrumented</h1>
+    <h2 class="reveal">Growing adoption across R&D.</h2>
+    <div class="cards cards-4 reveal" style="font-size:15px;">
+      <div class="card"><p>platform-api-router</p><p>board-app</p><p>ai-agent</p><p>data-validations</p><p>events-api</p><p>ai-app-builder</p><p>monday-apps-backend</p></div>
+      <div class="card"><p>sphera</p><p>automations</p><p>apps-edge</p><p>marketing-channels</p><p>lite-builder</p><p>infra-ops</p><p>platform-agent</p></div>
+      <div class="card"><p>monday-agents</p><p>board-agents</p><p>agent-management</p><p>hierarchy</p><p>ai-scorecards</p><p>mndy-code</p><p>objects</p></div>
+      <div class="card"><p>ai-incident-insights</p><p>data-migration</p><p>kafka-sdk-switchover-test</p><p>boards-ai-blocks</p><p>skills</p><p>rm-events</p><p style="color:var(--dim)">+ more coming</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 25: INTEGRATION -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Control</div>
+    <h1 class="reveal">Integration & <span class="hl">Control</span></h1>
+    <h2 class="reveal">Full control via feature flags — per service, per region, per environment.</h2>
+    <div class="cards cards-2 reveal">
+      <div class="card accent">
+        <h3>What we built</h3>
+        <ul class="styled" style="margin-top:12px;">
+          <li>Feature flags — per service, region, environment</li>
+          <li>Smooth release — gradual rollout</li>
+          <li>Kill switch — instant disable, no deploy</li>
+          <li>Forensics control — independent toggle</li>
+        </ul>
+      </div>
+      <div class="card green">
+        <h3>Operational safety</h3>
+        <ul class="styled" style="margin-top:12px;">
+          <li>No impact on service SLAs</li>
+          <li>Smart sampling, configurable overhead</li>
+          <li>Per-region control (us-east, eu-central)</li>
+          <li>Per-service without affecting others</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 26: WHAT'S NEXT -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Roadmap</div>
+    <h1 class="reveal">What's <span class="hl">Next</span></h1>
+    <h2 class="reveal">Expanding depth and automation.</h2>
+    <div class="cards cards-2 reveal" style="margin-bottom:24px;">
+      <div class="card accent">
+        <h3>Self-heal via GitHub Actions</h3>
+        <p>Code access approved — auto-remediation coming. From detection to deployed fix, no human in the loop.</p>
+      </div>
+      <div class="card accent">
+        <h3>Canary Integration</h3>
+        <p>Hud as data source for canary agents — auto-rollback on regression. Coverage verification built-in.</p>
+      </div>
+      <div class="card green">
+        <h3>PR Risk Analysis</h3>
+        <p>Surface production risk directly in PR reviews. Hot path detection before merge.</p>
+      </div>
+      <div class="card green">
+        <h3>More Services</h3>
+        <p>Continuing rollout across R&D. Teams requesting onboarding after seeing peer results.</p>
+      </div>
+    </div>
+    <div class="callout reveal">
+      <p>From <span class="hl">reactive debugging</span> → <span class="gr">proactive intelligence</span> → <span class="am">autonomous remediation</span>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 27: CLOSING -->
+<section class="slide slide-title">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Thank You</div>
+    <h1 class="reveal">Hud at <span class="hl">monday.com</span></h1>
+    <p class="subtitle reveal">Proven value. Real results. Growing adoption.</p>
+    <div class="reveal"><span class="pill green">Questions?</span></div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- === NAVIGATION === -->
+<div class="nav">
+  <button id="prev" onclick="navigate(-1)" disabled>← Prev</button>
+  <span style="font-weight:500;">Hud at monday.com</span>
+  <button id="next" onclick="navigate(1)">Next →</button>
+  <span id="slide-num">1 / 27</span>
+</div>
+
+<script>
+/* === SLIDE CONTROLLER === */
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let current = 0;
+const stage = document.getElementById('deckStage');
+
+function scaleStage() {
+  const factor = Math.min(window.innerWidth / 1920, (window.innerHeight - 52) / 1080);
+  const x = (window.innerWidth - 1920 * factor) / 2;
+  const y = ((window.innerHeight - 52) - 1080 * factor) / 2;
+  stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+}
+scaleStage();
+window.addEventListener('resize', scaleStage);
+
+function showSlide(index) {
+  slides[current].classList.remove('active', 'visible');
+  current = Math.max(0, Math.min(total - 1, index));
+  slides[current].classList.add('active', 'visible');
+  document.getElementById('slide-num').textContent = (current + 1) + ' / ' + total;
+  document.getElementById('prev').disabled = current === 0;
+  document.getElementById('next').disabled = current === total - 1;
+}
+
+function navigate(dir) { showSlide(current + dir); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); navigate(1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); navigate(-1); }
+});
+
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) navigate(diff > 0 ? 1 : -1);
+});
+
+showSlide(0);
+</script>
+</body>
+</html>
