@@ -4,6 +4,7 @@
 .reactable .reaction-button,
 [data-testid="upvote-button"],
 .gsc-comment .gsc-comment-reactions,
-.gsc-reply .gsc-reply-reactions {
+.gsc-reply .gsc-reply-reactions,
+.gsc-footer {
   display: none !important;
 }
