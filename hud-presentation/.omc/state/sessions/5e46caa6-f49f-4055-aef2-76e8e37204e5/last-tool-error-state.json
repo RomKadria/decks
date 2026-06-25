@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"gh repo delete RomKadria/hud-presentation --yes\",\"description\":\"Delete the single-purpose hud-presentation repo\"}",
-  "error": "Exit code 1\nHTTP 403: Must have admin rights to Repository. (https://api.github.com/repos/RomKadria/hud-presentation)\nThis API operation needs the \"delete_repo\" scope. To request it, run:  gh auth refresh -h github.com -s delete_repo",
-  "timestamp": "2026-06-25T00:55:03.830Z",
-  "retry_count": 1
-}
