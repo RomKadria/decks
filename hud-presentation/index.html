@@ -765,34 +765,49 @@ showSlide(0);
 
 <div id="comments-panel" style="position:fixed;top:0;right:-420px;width:420px;height:100vh;background:#1e2235;border-left:1px solid var(--border);z-index:10000;transition:right 0.3s var(--ease);overflow-y:auto;padding:24px;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-    <h3 style="font-family:var(--font-display);color:var(--text);font-size:20px;">Feedback</h3>
+    <h3 id="panel-title" style="font-family:var(--font-display);color:var(--text);font-size:20px;">Feedback — Slide 1</h3>
     <button id="close-panel" onclick="document.getElementById('comments-panel').classList.remove('open')" style="background:none;border:none;color:var(--dim);font-size:24px;cursor:pointer;">✕</button>
   </div>
-  <script src="https://giscus.app/client.js"
-    data-repo="RomKadria/decks"
-    data-repo-id="R_kgDOTEcLGQ"
-    data-category="General"
-    data-category-id="DIC_kwDOTEcLGc4C_1gJ"
-    data-mapping="pathname"
-    data-strict="0"
-    data-reactions-enabled="0"
-    data-emit-metadata="0"
-    data-input-position="top"
-    data-theme="dark_tritanopia"
-    data-lang="en"
-    crossorigin="anonymous"
-    async>
-  </script>
+  <div id="giscus-container"></div>
 </div>
 <style>
   #comments-panel.open { right: 0 !important; }
 </style>
 <script>
+function loadGiscus(slideNum) {
+  var container = document.getElementById('giscus-container');
+  container.innerHTML = '';
+  document.getElementById('panel-title').textContent = 'Feedback — Slide ' + slideNum;
+  var script = document.createElement('script');
+  script.src = 'https://giscus.app/client.js';
+  script.setAttribute('data-repo', 'RomKadria/decks');
+  script.setAttribute('data-repo-id', 'R_kgDOTEcLGQ');
+  script.setAttribute('data-category', 'General');
+  script.setAttribute('data-category-id', 'DIC_kwDOTEcLGc4C_1gJ');
+  script.setAttribute('data-mapping', 'specific');
+  script.setAttribute('data-term', 'hud-presentation/slide-' + slideNum);
+  script.setAttribute('data-strict', '0');
+  script.setAttribute('data-reactions-enabled', '0');
+  script.setAttribute('data-emit-metadata', '1');
+  script.setAttribute('data-input-position', 'top');
+  script.setAttribute('data-theme', 'dark_tritanopia');
+  script.setAttribute('data-lang', 'en');
+  script.crossOrigin = 'anonymous';
+  container.appendChild(script);
+}
 document.getElementById('comments-btn').addEventListener('click', function() {
+  loadGiscus(current + 1);
   document.getElementById('comments-panel').classList.add('open');
 });
 document.getElementById('close-panel').addEventListener('click', function() {
   document.getElementById('comments-panel').classList.remove('open');
+});
+window.addEventListener('message', function(event) {
+  if (event.origin !== 'https://giscus.app') return;
+  if (!event.data || !event.data.giscus || !event.data.giscus.discussion) return;
+  var count = event.data.giscus.discussion.totalCommentCount;
+  var btn = document.getElementById('comments-btn');
+  btn.textContent = count > 0 ? '💬 Feedback (' + count + ')' : '💬 Feedback';
 });
 </script>
 </body>
