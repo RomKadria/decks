@@ -246,6 +246,7 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
           <li><strong style="color:var(--green)">Code-connected</strong> — IDE + MCP linked to code & git</li>
           <li><strong style="color:var(--green)">Forensics</strong> — auto-traces on errors/spikes</li>
           <li><strong style="color:var(--green)">Unfamiliar service?</strong> — Hud MCP gives you the full story</li>
+          <li><strong style="color:var(--green)">Agent-ready</strong> — function-level truth for the code agents now ship</li>
         </ul>
       </div>
     </div>
@@ -341,7 +342,7 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
       </div>
     </div>
     <div class="callout reveal">
-      <p>Other tools give you data <em>after</em> something breaks. Hud gives you production intelligence <strong style="color:var(--green)">at every stage</strong>.</p>
+      <p>Other tools give you data <em>after</em> something breaks. Hud gives you production intelligence <strong style="color:var(--green)">at every stage</strong> — the function-level context agents need to ship and fix code safely.</p>
     </div>
   </div>
 </section>
@@ -621,6 +622,9 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
     <div class="callout green reveal">
       <p>DD/Coralogix <strong style="color:var(--green)">detect</strong>. Hud <strong style="color:var(--green)">pinpoints</strong>. Together: alert → root cause → fix, automatically.</p>
     </div>
+    <div class="callout reveal" style="margin-top:16px;">
+      <p><strong class="am">Why now:</strong> agents are writing more of the code that ships to prod. Service-level tools can't see what that code does <em>inside</em> a function — <strong style="color:var(--green)">Hud gives agents the function-level ground truth</strong> to detect and fix their own regressions.</p>
+    </div>
   </div>
 </section>
 
@@ -698,7 +702,33 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 27: CLOSING -->
+<!-- 27: THE ASK -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">We Want Your Read</div>
+    <h1 class="reveal">Where's the <span class="hl">Biggest Bet</span> After GA?</h1>
+    <h2 class="reveal">We can move fast on any of these — your input shapes the order.</h2>
+    <div class="cards cards-3 reveal" style="margin-bottom:28px;">
+      <div class="card accent">
+        <h3>Self-Heal</h3>
+        <p>Detection → deployed fix, no human in the loop. Highest automation payoff, highest bar to get right.</p>
+      </div>
+      <div class="card accent">
+        <h3>PR Risk Analysis</h3>
+        <p>Hot-path detection in review — stop risky changes before merge. Shifts value left, touches every engineer.</p>
+      </div>
+      <div class="card green">
+        <h3>Adoption Breadth</h3>
+        <p>Roll out across more of R&D. Compounds the wins you've seen — more teams, more surface covered.</p>
+      </div>
+    </div>
+    <div class="callout green reveal">
+      <p>Which of these moves the needle most for your org — and what would you want to see before betting on it?</p>
+    </div>
+  </div>
+</section>
+
+<!-- 28: CLOSING -->
 <section class="slide slide-title">
   <div class="slide-content">
     <div class="eyebrow reveal">Thank You</div>
