@@ -224,21 +224,39 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 2: TL;DR / IMPACT AT A GLANCE -->
+<!-- 2: TL;DR / HUD IN ONE SLIDE -->
 <section class="slide">
   <div class="slide-content">
     <div class="eyebrow reveal">TL;DR</div>
-    <h1 class="reveal">Impact at a <span class="gr">Glance</span></h1>
-    <h2 class="reveal">Function-level observability — already paying off across monday.com.</h2>
-    <div class="metric-row reveal" style="margin-bottom:28px;">
-      <div class="metric-box"><div class="num">28</div><div class="label">Services Instrumented</div></div>
-      <div class="metric-box"><div class="num">-95%</div><div class="label">Latency · apps-backend</div></div>
-      <div class="metric-box"><div class="num">-90%</div><div class="label">Errors · Boards PTB</div></div>
-      <div class="metric-box"><div class="num">14 min</div><div class="label">Queue issue caught post-deploy</div></div>
-      <div class="metric-box"><div class="num">Hrs→Min</div><div class="label">Investigation Time</div></div>
+    <h1 class="reveal">Hud in <span class="hl">One Slide</span></h1>
+    <h2 class="reveal">Function-level truth our service-level tools can't see — across the whole lifecycle.</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <div class="card accent">
+          <h3 style="color:var(--accent);">What it adds</h3>
+          <ul class="styled" style="margin-top:14px;">
+            <li><strong>Function-level depth</strong> — latency &amp; CPU per function, in prod</li>
+            <li><strong>Code-connected</strong> — IDE + MCP, linked to code &amp; git</li>
+            <li><strong>Auto-forensics</strong> — full-context traces only when something breaks</li>
+            <li><strong>Smart sampling</strong> — deep insight, low overhead</li>
+          </ul>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="card green">
+          <h3 style="color:var(--green);">Where it runs</h3>
+          <ul class="styled" style="margin-top:14px;">
+            <li><strong>Develop</strong> — production context in the IDE</li>
+            <li><strong>PR Review</strong> — hot-path risk before merge</li>
+            <li><strong>Canary</strong> — regression + coverage checks</li>
+            <li><strong>Production</strong> — alerts with function-level root cause</li>
+            <li><strong>Remediation</strong> — self-heal via GitHub Action</li>
+          </ul>
+        </div>
+      </div>
     </div>
     <div class="callout green reveal">
-      <p>A production outage prevented, AI-feature errors cut <strong style="color:var(--green)">10×</strong>, and a bad code removal stopped at PR review — all from <strong style="color:var(--green)">function-level truth</strong> our existing tools can't see.</p>
+      <p><strong style="color:var(--green)">Live on 28 services</strong> — and already preventing production incidents, not just reporting them.</p>
     </div>
   </div>
 </section>
