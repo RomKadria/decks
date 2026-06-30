@@ -563,7 +563,31 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 20: BOTTOM LINE DIVIDER -->
+<!-- 20: PR RISK ANALYSIS -->
+<section class="slide">
+  <div class="slide-content">
+    <div class="eyebrow reveal">Success Story · Live in PR Review</div>
+    <h1 class="reveal">Risk Analysis: <span class="rd">Bad Removal Stopped</span></h1>
+    <h2 class="reveal">PR claimed the endpoint was dead for 61+ days. Hud proved it was serving ~1,400 calls/day.</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <img src="images/pr-risk-analysis.png" class="slide-img" style="width:100%;">
+      </div>
+      <div class="reveal">
+        <div class="card" style="border-color:var(--accent-border);">
+          <h3 style="color:var(--red);">🔴 Flagged HIGH risk — before merge</h3>
+          <p>The bot scored the PR against live Hud telemetry, contradicted the "not invoked in 61+ days" claim, and named the exact function still in production: <strong>UsersController.getUserSlack</strong>.</p>
+        </div>
+        <div class="card green" style="margin-top:16px;">
+          <h3>The flip side of dead-code detection</h3>
+          <p>Same production truth — opposite call. Hud tells you what's <strong style="color:var(--green)">safe to delete</strong>, and stops what isn't. Here it prevented 404s for a live caller.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 21: BOTTOM LINE DIVIDER -->
 <section class="slide slide-divider">
   <div class="slide-content">
     <div class="eyebrow reveal">Summary</div>
@@ -571,7 +595,7 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 21: TIME TO INSIGHT -->
+<!-- 22: TIME TO INSIGHT -->
 <section class="slide">
   <div class="slide-content">
     <div class="eyebrow reveal">Comparison</div>
@@ -588,7 +612,7 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 22: BUSINESS IMPACT -->
+<!-- 23: BUSINESS IMPACT -->
 <section class="slide">
   <div class="slide-content">
     <div class="eyebrow reveal">Impact</div>
@@ -606,7 +630,7 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 23: HOW HUD FITS -->
+<!-- 24: HOW HUD FITS -->
 <section class="slide">
   <div class="slide-content">
     <div class="eyebrow reveal">Stack Integration</div>
@@ -628,7 +652,7 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 24: DEPLOYMENT -->
+<!-- 25: DEPLOYMENT -->
 <section class="slide">
   <div class="slide-content">
     <div class="eyebrow reveal">Scale</div>
@@ -643,7 +667,7 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 25: INTEGRATION -->
+<!-- 26: INTEGRATION -->
 <section class="slide">
   <div class="slide-content">
     <div class="eyebrow reveal">Control</div>
@@ -672,7 +696,7 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 26: WHAT'S NEXT -->
+<!-- 27: WHAT'S NEXT -->
 <section class="slide">
   <div class="slide-content">
     <div class="eyebrow reveal">Roadmap</div>
@@ -688,8 +712,8 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
         <p>Hud as data source for canary agents — auto-rollback on regression. Coverage verification built-in.</p>
       </div>
       <div class="card green">
-        <h3>PR Risk Analysis</h3>
-        <p>Surface production risk directly in PR reviews. Hot path detection before merge.</p>
+        <h3>PR Risk Analysis — already catching</h3>
+        <p>Live in review, scoring PRs against production telemetry (stopped a bad endpoint removal — PR #6243). Expanding hot-path detection across more repos.</p>
       </div>
       <div class="card green">
         <h3>More Services</h3>
@@ -702,7 +726,7 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 27: THE ASK -->
+<!-- 28: THE ASK -->
 <section class="slide">
   <div class="slide-content">
     <div class="eyebrow reveal">We Want Your Read</div>
@@ -728,7 +752,7 @@ ul.styled li::before { content: "→"; position: absolute; left: 0; color: var(-
   </div>
 </section>
 
-<!-- 28: CLOSING -->
+<!-- 29: CLOSING -->
 <section class="slide slide-title">
   <div class="slide-content">
     <div class="eyebrow reveal">Thank You</div>
